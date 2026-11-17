@@ -105,3 +105,8 @@ first coordinates-carrying advert).
 
 - Base: ripplebiz/MeshCore, tag `repeater-v1.18.0` (commit `81dbae5`)
 - Board-plumbing pattern: `variants/heltec_t114` from the same tree
+
+## License
+
+MIT — same as MeshCore upstream. See [LICENSE](LICENSE) (upstream copyright
+notice preserved, as MIT requires for derivatives).
