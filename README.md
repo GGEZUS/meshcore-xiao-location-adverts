@@ -1,6 +1,6 @@
 # Xiao nRF52840 — Location Adverts for MeshCore Repeaters
 
-A **two-file, 13-line patch** against official [MeshCore](https://github.com/ripplebiz/MeshCore)
+A **two-file, 13-line patch** against official [MeshCore](https://github.com/meshcore-dev/MeshCore)
 `v1.18.0` that makes a Seeed XIAO nRF52840 (Wio SX1262) repeater **visible on the network maps** —
 no GPS hardware, no protocol changes, stock code paths only.
 
@@ -54,7 +54,7 @@ for the full diff.
 ## Build
 
 ```sh
-git clone --depth 1 --branch repeater-v1.18.0 https://github.com/ripplebiz/MeshCore.git
+git clone --depth 1 --branch repeater-v1.18.0 https://github.com/meshcore-dev/MeshCore.git
 cd MeshCore
 git am /path/to/0001-enable-location-adverts-xiao-nrf52.patch
 pio run -e Xiao_nrf52_repeater -t create_uf2     # NOTE: UF2 needs the explicit create_uf2 target
@@ -75,10 +75,25 @@ coordinates, regions, duty cycle). Reverting = reflash any stock/community UF2.
 gps advert           # → "> none"   proves the feature compiled in
 gps advert prefs     # → "ok"       adverts now embed stored lat/lon
 time <epoch>         # fresh clock (boot resets it to a 2024 firmware epoch)
+set path.hash.mode 1 # optional — community-dependent, see below
 advert               # flood advert with coordinates
 ```
 
 [`enable_loc.py`](enable_loc.py) automates the sequence (pyserial).
+
+### Path hash width (community-dependent, one-time)
+
+Flood packets carry a *path* of short hashes of the repeaters they traversed. Stock defaults
+to **1-byte** hashes (`path.hash.mode 0` — still the upstream default). Communities running
+LusoFW-class forks standardize on **2-byte**, and their maps flag 1-byte-only nodes as
+"older firmware" — a freshly flashed stock build triggers exactly that warning even on
+current firmware. It's a stock runtime pref (no rebuild), persists in flash, and only
+affects the node's **own** flood adverts — repeated traffic keeps the originator's width:
+
+```
+get path.hash.mode   # → "> 0" (stock default)
+set path.hash.mode 1 # → "ok"
+```
 
 ## Verification — before/after
 
@@ -103,7 +118,7 @@ first coordinates-carrying advert).
 
 ## Credits / basis
 
-- Base: ripplebiz/MeshCore, tag `repeater-v1.18.0` (commit `81dbae5`)
+- Base: meshcore-dev/MeshCore (formerly ripplebiz), tag `repeater-v1.18.0` (commit `81dbae5`)
 - Board-plumbing pattern: `variants/heltec_t114` from the same tree
 
 ## License
